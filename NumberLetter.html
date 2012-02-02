@@ -1,138 +1,63 @@
-
+<!DOCTYPE html>
 <html>
-<head>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<head>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript">
-        
-        // Globals
-	    var letters = ".ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	    var comboArray;
-		var wordArray;
-
-		$(document).ready(function () {
-		    $('#submitInput').bind('click', function () { getAllPossibleWords(); });
-		});
-
-		function clean() {
-		    comboArray = new Array();
-		    wordArray = new Array();
-            $("#outputList").empty();
-		}
-
-		function getAllPossibleWords() {
-
-		    clean();
-		    var numericInput = $('#numericInput').val();
-
-		    if (!isNumber(numericInput)) return;
-
-		    getAllNumberCombos(numericInput);
-		    getWordArray();
-            displayWords();
-        }
-
-        function getAllNumberCombos(numericInput) {
-            var iterating = true;
-			var doublePosition = -1;
-            numericInput = numericInput.toString();
-
-            while (iterating) {
-                var combo = new Array();
-                var addWord = false;
-                var tempChar = "";
-
-                if (doublePosition == -1) addWord = true;
-
-                for (var i = 0; i < numericInput.length; i++) {
-
-                    tempChar = numericInput.substr(i, 1);
-
-                    if (i == doublePosition) {
-                        var tempNum = numericInput.substr(i, 2);
-                        if (tempNum <= 26 && tempNum >= 10) {
-                            combo.push(numericInput.substr(i, 2));
-                            addWord = true;
-                            i++;
-                        } else {
-                            combo.push(tempChar);
-                        }
+	    var letterMap = "abcdefghijklmnopqrstuvwxyz".split("");
+	    letterMap.unshift(null);
+		
+        function findPartitions(left, right, partitions){
+            var rest = right.slice(0),
+                partition = [],
+				ordinal;
+            
+            if ( right.length === 0 && left.length > 0 ){
+                partitions.push(left);
+            } else {
+                while ( rest.length > 0 ){
+                    partition.push(rest.shift());
+                    ordinal = partition.join("");
+                    if ( letterMap[ordinal] ) {
+                        findPartitions(left + letterMap[ordinal], right.slice(partition.length), partitions);
                     } else {
-                        if (tempChar == "0") {
-                            addWord = false;
-                        } else {
-                            combo.push(tempChar);
-                        }
+                        return;
                     }
-                }
-
-                if (comboArray.indexOf(combo) != -1 || doublePosition > numericInput.length - 1) { 
-                    iterating = false;
-                } else {
-                    if (addWord) {
-                        comboArray.push(combo);
-                    }
-                }
-
-				doublePosition++;
-            }
+               }
+           }
         }
-
-        function getWordArray() {
-
-            for (var i = 0; i < comboArray.length; i++) {
-                var word = "";
-                var currentCombo = comboArray[i];
-                for (var j = 0; j < currentCombo.length; j++) {
-                    var letter = returnLetter(currentCombo[j]);
-                    word += letter != undefined ? letter : "";
-                }
-                if (word.length > 0) {
-                    wordArray.push(word);
-                }
-            }
-
-        }
-
-        function isNumber(n) {
-            return !isNaN(parseFloat(n)) && isFinite(n);
-        }
-
-        function displayWords() {
-
-            var items = [];
-
-            $.each(wordArray, function (i, item) {
-                items.push('<li>' + item + '</li>');
+        
+        function displayWords(partitions){
+            $.each(partitions, function(i, partition){
+                 $('#outputList').append('<li>' + partition + '<\/li>');
             });
-
-            $('#outputList').append( items.join('') );
-
         }
 		
-		function returnLetter(position) {
-		    if (position < 1 || position > 26) return;
-			return letters.charAt(position);
-		}
+		function listPartitions() {
+		    $("#outputList").empty();
+		    var numericInput = $('#numericInput').val().split(""),
+		        partitions = [];
+		    findPartitions("", numericInput, partitions);
+            displayWords(partitions);
+        }
 		
+		$(document).ready(function () {
+            $('#submitInput').click(function () { listPartitions(); });
+        });
 	</script>
-</head>
-
-<body>
+	</head>
+	<body>
     <div style="margin: 30px;">
-   
-        <div>
-            Enter a number:
-        </div>
-        <div>
-            <input type="text" id="numericInput" style="width: 10em; padding: 5px; margin: 5px;" />
-        </div>
-        <div>
-            <button id="submitInput" style="width: 10em; padding: 5px; margin: 5px;">Get Words</button>
-        </div>
-        <div>
-            <ul id="outputList"></ul>
-        </div>
+      <div> Enter a number: </div>
+      <div>
+        <input type="text" id="numericInput" style="width: 10em; padding: 5px; margin: 5px;" />
+      </div>
+      <div>
+        <button id="submitInput" style="width: 10em; padding: 5px; margin: 5px;">Get Words</button>
+      </div>
+      <div>
+        <ul id="outputList">
+        </ul>
+      </div>
     </div>
 </body>
-
 </html>
