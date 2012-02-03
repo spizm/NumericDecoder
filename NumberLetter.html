@@ -1,63 +1,67 @@
 <!DOCTYPE html>
 <html>
-	<head>
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script type="text/javascript">
-	    var letterMap = "abcdefghijklmnopqrstuvwxyz".split("");
-	    letterMap.unshift(null);
-		
-        function findPartitions(left, right, partitions){
-            var rest = right.slice(0),
-                partition = [],
-				ordinal;
-            
-            if ( right.length === 0 && left.length > 0 ){
-                partitions.push(left);
-            } else {
-                while ( rest.length > 0 ){
-                    partition.push(rest.shift());
-                    ordinal = partition.join("");
-                    if ( letterMap[ordinal] ) {
-                        findPartitions(left + letterMap[ordinal], right.slice(partition.length), partitions);
-                    } else {
-                        return;
+    <head>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script type="text/javascript">
+            var letterMap = "abcdefghijklmnopqrstuvwxyz".split("");
+            letterMap.unshift(null);
+
+            function findPartitions(left, right, partitions) {
+                var rest = right.slice(0), partition = [], ordinal;
+
+                if(right.length === 0 && left.length > 0) {
+                    partitions.push(left);
+                } else {
+                    while(rest.length > 0) {
+                        partition.push(rest.shift());
+                        ordinal = partition.join("");
+                        if(letterMap[ordinal]) {
+                            findPartitions(left + letterMap[ordinal], right.slice(partition.length), partitions);
+                        } else {
+                            return;
+                        }
                     }
-               }
-           }
-        }
-        
-        function displayWords(partitions){
-            $.each(partitions, function(i, partition){
-                 $('#outputList').append('<li>' + partition + '<\/li>');
+                }
+            }
+
+            function displayWords(partitions) {
+                $.each(partitions, function(i, partition) {
+                    $('#outputList').append('<li>' + partition + '<\/li>');
+                });
+            }
+
+            function listPartitions() {
+                $("#outputList").empty();
+                var numericInput = $('#numericInput').val().split(""), partitions = [];
+                findPartitions("", numericInput, partitions);
+                displayWords(partitions);
+            }
+
+
+            $(document).ready(function() {
+                $('#submitInput').click(function() {
+                    listPartitions();
+                });
             });
-        }
-		
-		function listPartitions() {
-		    $("#outputList").empty();
-		    var numericInput = $('#numericInput').val().split(""),
-		        partitions = [];
-		    findPartitions("", numericInput, partitions);
-            displayWords(partitions);
-        }
-		
-		$(document).ready(function () {
-            $('#submitInput').click(function () { listPartitions(); });
-        });
-	</script>
-	</head>
-	<body>
-    <div style="margin: 30px;">
-      <div> Enter a number: </div>
-      <div>
-        <input type="text" id="numericInput" style="width: 10em; padding: 5px; margin: 5px;" />
-      </div>
-      <div>
-        <button id="submitInput" style="width: 10em; padding: 5px; margin: 5px;">Get Words</button>
-      </div>
-      <div>
-        <ul id="outputList">
-        </ul>
-      </div>
-    </div>
-</body>
+
+        </script>
+    </head>
+    <body>
+        <div style="margin: 30px;">
+            <div>
+                Enter a number:
+            </div>
+            <div>
+                <input type="text" id="numericInput" style="width: 10em; padding: 5px; margin: 5px;" />
+            </div>
+            <div>
+                <button id="submitInput" style="width: 10em; padding: 5px; margin: 5px;">
+                    Get Words
+                </button>
+            </div>
+            <div>
+                <ul id="outputList"></ul>
+            </div>
+        </div>
+    </body>
 </html>
